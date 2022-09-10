@@ -19,12 +19,12 @@ services:
     environment:
       - DRONE_GITHUB_SKIP_VERIFY=true
       - DRONE_AGENTS_ENABLED=true
-      - DRONE_SERVER_HOST=localhost:8000
-      - DRONE_SERVER_PROTO=http
+      - DRONE_SERVER_HOST=drone-cynicsoft.duckdns.org
+      - DRONE_SERVER_PROTO=https
       - DRONE_TLS_AUTOCERT=false
       - DRONE_OPEN=false
-      - DRONE_HOST=http://localhost:8000
       - DRONE_GITHUB=true
+      # - DRONE_LOGS_TRACE=true 
       # Variables below set via drone.env file
       # - DRONE_USER_CREATE=
       # - DRONE_USER_FILTER=
@@ -42,10 +42,11 @@ services:
       - drone
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    # env_file:
-    #   - ./drone.env
+    env_file: [drone-stack_drone.env]
     environment:
-      - DRONE_RPC_SERVER=drone-server:8000
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=drone-server
+      # - DRONE_LOGS_TRACE=true 
       # Variables below set via drone.env file
       # - DRONE_RPC_SECRET=
 
