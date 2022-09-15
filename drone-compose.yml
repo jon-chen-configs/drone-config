@@ -1,6 +1,23 @@
-version: '3.5'
-
 services:
+  drone-agent:
+    image: drone/agent:1
+    command: agent
+    restart: always
+    depends_on:
+      - drone-server
+    networks:
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+    env_file: ["${ENV_DIR:-}/compose/drone-stack/drone.env"]
+    environment:
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=drone-server
+      - DRONE_RUNNER_VOLUMES=/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+      - DRONE_RUNNER_NETWORKS=drone-stack_default
+      # - DRONE_LOGS_TRACE=true
+
   drone-server:
     image: drone/drone:2
     ports:
@@ -10,11 +27,13 @@ services:
       macvlan:
         ipv4_address: 192.168.20.6
         ipv6_address: 2601:c6:8300:1df::84
-      drone:
+      default:
     volumes:
       - drone_data:/var/lib/drone/
       - /var/run/docker.sock:/var/run/docker.sock
-    env_file: [drone-stack_drone.env]
+    env_file:
+      - "${ENV_DIR:-}/compose/drone-stack/drone.env"
+      - "${ENV_DIR:-}/compose/drone-stack/postgres.env"
     restart: always
     environment:
       - DRONE_GITHUB_SKIP_VERIFY=true
@@ -25,30 +44,16 @@ services:
       - DRONE_OPEN=false
       - DRONE_GITHUB=true
       # - DRONE_LOGS_TRACE=true 
-      # Variables below set via drone.env file
-      # - DRONE_USER_CREATE=
-      # - DRONE_USER_FILTER=
-      # - DRONE_GITHUB_CLIENT_ID=
-      # - DRONE_GITHUB_CLIENT_SECRET=
-      # - DRONE_RPC_SECRET=
 
-  drone-agent:
-    image: drone/agent:1
-    command: agent
-    restart: always
-    depends_on:
-      - drone-server
+
+  postgres:
+    image: postgres:10
+    hostname: drone-postgres 
+    env_file: ["${ENV_DIR:-}/compose/drone-stack/postgres.env"]
     networks:
-      - drone
+      - default
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file: [drone-stack_drone.env]
-    environment:
-      - DRONE_RPC_PROTO=http
-      - DRONE_RPC_HOST=drone-server
-      # - DRONE_LOGS_TRACE=true 
-      # Variables below set via drone.env file
-      # - DRONE_RPC_SECRET=
+      - postgres_data:/var/lib/postgresql/data
 
 
 volumes:
@@ -57,11 +62,18 @@ volumes:
       type: nfs
       o: addr=avengershq.cynicsoft.net,nolock,noresvport,vers=2
       device: :${DATADIR}/drone-stack/data
+  postgres_data:
+    driver_opts:
+      type: nfs
+      o: addr=avengershq.cynicsoft.net,nolock,noresvport,vers=2
+      device: :${DATADIR}/drone-stack/postgres
 
 
 networks:
-  drone:
-    name: drone_network
+  default:
+    name: drone-stack_default
+    driver: overlay
+    attachable: true
   macvlan:
     external: true
     name: docker-macvlan
