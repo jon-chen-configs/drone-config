@@ -45,6 +45,17 @@ services:
       - DRONE_GITHUB=true
       # - DRONE_LOGS_TRACE=true 
 
+  # https://github.com/meltwater/drone-convert-pathschanged
+  drone-convert-pathschanged:
+    image: meltwater/drone-convert-pathschanged
+    networks:
+      - default
+    env_file: ["${ENV_DIR:-}/compose/drone-stack/drone-convert-pathschanged.env"]
+    expose: 
+      - 3000
+    restart: always
+    environment:
+      # - DRONE_DEBUG=true
 
   postgres:
     image: postgres:10
@@ -60,12 +71,12 @@ volumes:
   drone_data:
     driver_opts:
       type: nfs
-      o: addr=avengershq.cynicsoft.net,nolock,noresvport,vers=2
+      o: addr=${NAS_HOST},nolock,noresvport,vers=2
       device: :${DATADIR}/drone-stack/data
   postgres_data:
     driver_opts:
       type: nfs
-      o: addr=avengershq.cynicsoft.net,nolock,noresvport,vers=2
+      o: addr=${NAS_HOST},nolock,noresvport,vers=2
       device: :${DATADIR}/drone-stack/postgres
 
 
