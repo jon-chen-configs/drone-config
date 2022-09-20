@@ -1,0 +1,33 @@
+services:
+  drone-agent:
+    image: drone/agent:1
+    command: agent
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        # Docker (20.10.3) on Synology bug where env vars from env_file 
+        # not set on container.
+        # constraints: [node.platform.arch != aarch64]
+        constraints:
+          - node.role == manager
+          - node.platform.arch != aarch64
+          - node.hostname != ${NAS_HOSTNAME}
+    networks:
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+    env_file: ["${ENV_DIR:-}/compose/drone-stack/drone.env"]
+    environment:
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_HOST=drone-server
+      - DRONE_RUNNER_VOLUMES=/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+      - DRONE_RUNNER_NETWORKS=drone-stack_default
+      # - DRONE_LOGS_TRACE=true
+
+networks:
+  default:
+    name: drone-stack_default
+    external: true
