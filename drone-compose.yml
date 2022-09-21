@@ -29,7 +29,7 @@ services:
       - homepage.name=Drone CI
       - homepage.group=Network
       - homepage.icon=https://raw.githubusercontent.com/modem7/MiscAssets/master/Icons/Dashboard-Icons/droneblue.png
-      - homepage.href=https://drone.cynicsoft.net/
+      - homepage.href=http://drone.cynicsoft.net/
       - homepage.description=Continuous Integration platform
 
   # https://github.com/meltwater/drone-convert-pathschanged
