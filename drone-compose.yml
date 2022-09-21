@@ -28,7 +28,7 @@ services:
     labels:
       - homepage.name=Drone CI
       - homepage.group=Network
-      - homepage.icon=https://github.com/modem7/MiscAssets/blob/master/Icons/Dashboard-Icons/droneblue.png
+      - homepage.icon=https://raw.githubusercontent.com/modem7/MiscAssets/master/Icons/Dashboard-Icons/droneblue.png
       - homepage.href=https://drone.cynicsoft.net/
       - homepage.description=Continuous Integration platform
 
