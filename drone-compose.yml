@@ -25,6 +25,12 @@ services:
       - DRONE_OPEN=false
       - DRONE_GITHUB=true
       # - DRONE_LOGS_TRACE=true 
+    labels:
+      - homepage.name=Drone CI
+      - homepage.group=Network
+      - homepage.icon=https://github.com/modem7/MiscAssets/blob/master/Icons/Dashboard-Icons/droneblue.png
+      - homepage.href=https://drone.cynicsoft.net/
+      - homepage.description=Continuous Integration platform
 
   # https://github.com/meltwater/drone-convert-pathschanged
   drone-convert-pathschanged:
